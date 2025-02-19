@@ -8,6 +8,16 @@ class TestTextNode(unittest.TestCase):
         node2 = TextNode("This is a text node", TextType.BOLD)
         self.assertEqual(node, node2)
 
+    def test_not_eq(self):
+        node = TextNode("This is a text node", TextType.BOLD)
+        node2 = TextNode("This is a text node", TextType.ITALIC)
+        self.assertNotEqual(node, node2)
+
+    def test_is_not(self):
+        node = TextNode("This is a text node", TextType.BOLD)
+        node2 = TextNode("This is a text node", TextType.BOLD)
+        self.assertIsNot(node, node2, "These nodes are not equal")
+
 
 if __name__ == "__main__":
     unittest.main()
