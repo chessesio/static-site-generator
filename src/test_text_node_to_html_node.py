@@ -11,5 +11,5 @@ class TestTextNode(unittest.TestCase):
 
     def test_bold_text_type(self):
         self.assertEqual(
-            self.leaf_node_.tag, text_node_to_html_node(self.text_node_.tag)
+            self.leaf_node_.tag, text_node_to_html_node(self.text_node_).tag
         )
