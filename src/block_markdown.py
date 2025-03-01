@@ -1,4 +1,15 @@
+from enum import Enum
+
 from inline_markdown import text_to_textnodes
+
+
+class BlockTypes(Enum):
+    PARAGRAPH = "paragraph"
+    HEADING = "heading"
+    CODE = "code"
+    QUOTE = "quote"
+    UNORDERED_LIST = "unordered_list"
+    ORDERED_LIST = "ordered_list"
 
 
 def markdown_to_blocks(markdown):
@@ -9,14 +20,16 @@ def markdown_to_blocks(markdown):
     return md_blocks
 
 
-markdown = """
-# This is a heading
+def block_to_blocktype(block):
+    if block[0] == "#":
+        return BlockTypes.HEADING
+    if block[:3] == "```" and block[-3:] == "```":
+        return BlockTypes.CODE
+    if block[0] == ">":
+        return BlockTypes.QUOTE
+    if block[0] == "-":
+        return BlockTypes.UNORDERED_LIST
+    if block[0].isnumeric() and block[1] == "." and block[2] == " ":
+        return BlockTypes.ORDERED_LIST
 
-This is a paragraph of text. It has some **bold** and _italic_ words inside of it.
-
-- This is the first list item in a list block
-- This is a list item
-- This is another list item
-"""
-
-markdown_to_blocks(markdown)
+    return BlockTypes.PARAGRAPH
