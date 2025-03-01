@@ -1,6 +1,7 @@
 import unittest
 
-from textnode import TextNode, TextType, split_nodes_delimiter
+from textnode import LeafNode, TextNode, TextType, text_node_to_html_node
+
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -18,13 +19,12 @@ class TestTextNode(unittest.TestCase):
         node2 = TextNode("This is a text node", TextType.BOLD)
         self.assertIsNot(node, node2, "These nodes are not equal")
 
-    def test_split_nodes_delimiter(self):
-        node1 = TextNode("This is text with a `code block` word", TextType.TEXT)
-        node2 = TextNode("This is text with a **bold** word", TextType.TEXT)
-        #node3 = TextNode("This is text with an *italic* word", TextType.TEXT)
 
-        self.assertEqual("This is text with a ", split_nodes_delimiter([node1], "`", TextType.CODE)[0].text)
-        self.assertEqual(TextType.BOLD, split_nodes_delimiter([node2], "**", TextType.BOLD)[1].text_type)
+class TestTextNodeToHTML(unittest.TestCase):
+    def test_bold_text_type(self):
+        leaf_node_ = LeafNode(tag="b", value="Bold Text")
+        text_node_ = TextNode(text="Bold Text", text_type=TextType.BOLD)
+        self.assertEqual(leaf_node_.tag, text_node_to_html_node(text_node_).tag)
 
 
 if __name__ == "__main__":
