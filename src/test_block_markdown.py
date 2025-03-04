@@ -1,6 +1,6 @@
 import unittest
 
-from block_markdown import BlockTypes, block_to_blocktype, markdown_to_blocks
+from block_markdown import BlockType, block_to_blocktype, markdown_to_blocks, markdown_to_html_node
 
 
 class TestMarkdownToBlocks(unittest.TestCase):
@@ -15,7 +15,6 @@ This is a paragraph of text. It has some **bold** and _italic_ words inside of i
 - This is another list item
         """
         blocks = markdown_to_blocks(markdown)
-        print(f"------\n{blocks}\n--------")
         self.assertEqual(
             blocks,
             [
@@ -36,9 +35,9 @@ This is a paragraph of text. It has some **bold** and _italic_ words inside of i
         - This is another list item
         """
         block_types = [
-            BlockTypes.HEADING,
-            BlockTypes.PARAGRAPH,
-            BlockTypes.UNORDERED_LIST,
+            BlockType.HEADING,
+            BlockType.PARAGRAPH,
+            BlockType.UNORDERED_LIST,
         ]
 
         self.assertEqual(
@@ -62,9 +61,9 @@ This is a paragraph of text. It has some **bold** and _italic_ words inside of i
         3. This is another list item
         """
         block_types = [
-            BlockTypes.HEADING,
-            BlockTypes.PARAGRAPH,
-            BlockTypes.ORDERED_LIST,
+            BlockType.HEADING,
+            BlockType.PARAGRAPH,
+            BlockType.ORDERED_LIST,
         ]
 
         self.assertEqual(
@@ -77,6 +76,15 @@ This is a paragraph of text. It has some **bold** and _italic_ words inside of i
             ),
         )
 
+    def test_md_to_html(self):
+        md = """
+        This is **bolded** paragraph text in a p tag here
+
+        This is another paragraph with _italic_ text and `code` here
+
+        """
+        html = markdown_to_html_node(md).to_html()
+        self.assertEqual(html, "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>")
 
 if __name__ == "__main__":
     unittest.main()

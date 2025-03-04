@@ -1,9 +1,11 @@
 from enum import Enum
 
+from htmlnode import ParentNode
 from inline_markdown import text_to_textnodes
+from textnode import TextNode, TextType, text_node_to_html_node
 
 
-class BlockTypes(Enum):
+class BlockType(Enum):
     PARAGRAPH = "paragraph"
     HEADING = "heading"
     CODE = "code"
@@ -22,14 +24,82 @@ def markdown_to_blocks(markdown):
 
 def block_to_blocktype(block):
     if block[0] == "#":
-        return BlockTypes.HEADING
+        return BlockType.HEADING
     if block[:3] == "```" and block[-3:] == "```":
-        return BlockTypes.CODE
+        return BlockType.CODE
     if block[0] == ">":
-        return BlockTypes.QUOTE
+        return BlockType.QUOTE
     if block[0] == "-":
-        return BlockTypes.UNORDERED_LIST
+        return BlockType.UNORDERED_LIST
     if block[0].isnumeric() and block[1] == "." and block[2] == " ":
-        return BlockTypes.ORDERED_LIST
+        return BlockType.ORDERED_LIST
+    return BlockType.PARAGRAPH
 
-    return BlockTypes.PARAGRAPH
+
+def markdown_to_html_node(markdown):
+    blocks = markdown_to_blocks(markdown)
+    tag = "div"
+    children = []
+    for block in blocks:
+        children.append(create_parentnode(block))
+    return ParentNode(tag, children)
+
+
+# Helpter function to take block text and return a list of children html nodes
+def text_to_children(text):
+    textnodes = text_to_textnodes(text)
+    children = []
+    for textnode in textnodes:
+        children.append(text_node_to_html_node(textnode))
+    return children
+
+
+# helper function to split unordered lists to children html nodes
+def get_unordered_list_children(list_block):
+    list_items = list_block.split("\n- ")
+    children = []
+    for item in list_items:
+        children.append(ParentNode("li", text_to_children(item)))
+    return children
+
+
+# helper function to split ordered lists to children html nodes
+def get_ordered_list_children(list_block):
+    list_items = list_block.split("\n")
+    children = []
+    for item in list_items:
+        children.append(ParentNode("li", text_to_children(item[3:])))
+    return children
+
+
+# Helper function to take children return their parent node of the respective type
+def create_parentnode(block):
+    block_type = block_to_blocktype(block)
+    if block_type == BlockType.PARAGRAPH:
+        tag = "p"
+        children = text_to_children(block)
+        return ParentNode(tag, children)
+    if block_type == BlockType.HEADING:
+        heading_num = len(block.split()[0])
+        tag = f"h{heading_num}"
+        text = block.strip("# ")
+        children = text_to_children(text)
+        return ParentNode(tag, children)
+    if block_type == BlockType.UNORDERED_LIST:
+        tag = "ul"
+        children = get_unordered_list_children(block)
+        return ParentNode(tag, children)
+    if block_type == BlockType.ORDERED_LIST:
+        tag = "ol"
+        children = get_ordered_list_children(block)
+        return ParentNode(tag, children)
+    if block_type == BlockType.QUOTE:
+        tag = "blockquote"
+        text = block.strip("> ")
+        children = text_to_children(text)
+        return ParentNode(tag, children)
+    if block_type == BlockType.CODE:
+        tag = "code"
+        text = block[3:-3]
+        children = [text_node_to_html_node(TextNode(text, TextType.CODE))]
+        return ParentNode(tag, children)
