@@ -34,6 +34,12 @@ def extract_markdown_link(text):
     return matches
 
 
+def extract_title(markdown):
+    if markdown[:2] != "# ":
+        raise ValueError("Document is missing a H1 header, H1 header required")
+    return markdown.split("\n")[0][2:]
+
+
 def split_nodes_image(old_nodes):
     new_nodes = []
     for node in old_nodes:

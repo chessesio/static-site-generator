@@ -1,8 +1,9 @@
 import unittest
 
 from inline_markdown import (extract_markdown_image, extract_markdown_link,
-                             split_nodes_delimiter, split_nodes_image,
-                             split_nodes_link, text_to_textnodes)
+                             extract_title, split_nodes_delimiter,
+                             split_nodes_image, split_nodes_link,
+                             text_to_textnodes)
 from textnode import TextNode, TextType
 
 
@@ -81,6 +82,31 @@ class TestTextToTextNode(unittest.TestCase):
             TextNode("link", TextType.LINK, "https://boot.dev"),
         ]
         self.assertEqual(text_to_textnodes(input_text), output_)
+
+
+class TestExtactTitleSuccess(unittest.TestCase):
+    def test_extract_title(self):
+        markdown = """# Tolkien Fan Club
+
+![JRR Tolkien sitting](/images/tolkien.png)
+
+Here's the deal, **I like Tolkien**.
+"""
+        title = extract_title(markdown)
+        print(f"title = {title}")
+        self.assertEqual(title, "Tolkien Fan Club")
+
+
+    def test_extract_title_exception(self):
+        markdown = """
+        # Tolkien Fan Club
+
+![JRR Tolkien sitting](/images/tolkien.png)
+
+Here's the deal, **I like Tolkien**.
+"""
+        with self.assertRaises(ValueError):
+            extract_title(markdown)
 
 
 if __name__ == "__main__":
