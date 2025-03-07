@@ -28,6 +28,10 @@ def generate_page(from_path, template_path, destination_path, basepath):
     html_text = markdown_to_html_node(md_text).to_html()
     html_template = html_template.replace("{{ Title }}", html_title)
     html_template = html_template.replace("{{ Content }}", html_text)
+    html_template = html_template.replace('href="/', 'href="' + basepath)
+    html_template = html_template.replace("href='/", "href='" + basepath)
+    html_template = html_template.replace('src="/', 'src="' + basepath)
+    html_template = html_template.replace("src='/", "src='" + basepath)
 
     destination_dir_path = os.path.dirname(destination_path)
 
