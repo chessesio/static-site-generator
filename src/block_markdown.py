@@ -56,10 +56,10 @@ def text_to_children(text):
 
 # helper function to split unordered lists to children html nodes
 def get_unordered_list_children(list_block):
-    list_items = list_block.split("\n- ")
+    list_items = list_block.split("\n")
     children = []
     for item in list_items:
-        children.append(ParentNode("li", text_to_children(item)))
+        children.append(ParentNode("li", text_to_children(item[2:])))
     return children
 
 
