@@ -5,20 +5,19 @@ from inline_markdown import extract_title
 from pathlib import Path
 
 
-def generate_pages_recursive(dir_path_content, template_path, dir_destination_path):
+def generate_pages_recursive(dir_path_content, template_path, dir_destination_path, basepath):
     for path in os.listdir(dir_path_content):
         from_path = os.path.join(dir_path_content, path)
         destination_path = os.path.join(dir_destination_path, path)
         if os.path.isfile(from_path):
             destination_path = Path(destination_path).with_suffix(".html")
-            generate_page(from_path, template_path, destination_path)
+            generate_page(from_path, template_path, destination_path, basepath)
         else:
             print(from_path)
-            generate_pages_recursive(from_path, template_path, destination_path)
+            generate_pages_recursive(from_path, template_path, destination_path, basepath)
 
 
-
-def generate_page(from_path, template_path, destination_path):
+def generate_page(from_path, template_path, destination_path, basepath):
     print(
         f"Generating page from {from_path} to {destination_path} using {template_path}"
     )
@@ -29,6 +28,10 @@ def generate_page(from_path, template_path, destination_path):
     html_text = markdown_to_html_node(md_text).to_html()
     html_template = html_template.replace("{{ Title }}", html_title)
     html_template = html_template.replace("{{ Content }}", html_text)
+    html_template = html_template.replace('href="/', 'href="' + basepath)
+    html_template = html_template.replace("href='/", "href='" + basepath)
+    html_template = html_template.replace('src="/', 'href="' + basepath)
+    html_template = html_template.replace("src='/", "href='" + basepath)
 
     destination_dir_path = os.path.dirname(destination_path)
 
